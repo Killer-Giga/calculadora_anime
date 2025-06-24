@@ -4,8 +4,6 @@ import 'package:calculadora_anime/widgets/calc_button.dart';
 /*
   PENDIENTES:
   1- Manejar bien los numeros para que no se llene la pantalla o bien que funcionen como la calculadora de windows
-  2- Que los botones esten fijos. Si aumentan los numeros estos no haran que se bajen.
-  3
 */
 
 class CalculatorScreen extends StatefulWidget {
