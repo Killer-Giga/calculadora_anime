@@ -246,6 +246,7 @@ class CalculatorLogic {
       formattedExpression(evalResult);
     } catch (e) {
       _result = "Error";
+      rethrow;
     }
   }
 

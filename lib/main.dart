@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:calculadora_anime/views/calculator_screen.dart';
+import 'package:calculadora_fea_a_5_pesos/views/calculator_screen.dart';
 
 void main() {
     runApp(const MyApp());
