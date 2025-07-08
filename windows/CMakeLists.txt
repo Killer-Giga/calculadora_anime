@@ -1,10 +1,10 @@
 # Project-level configuration.
 cmake_minimum_required(VERSION 3.14)
-project(calculadora_anime LANGUAGES CXX)
+project(calculadora_fea_a_5_pesos LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
-set(BINARY_NAME "calculadora_anime")
+set(BINARY_NAME "calculadora_fea_a_5_pesos")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.

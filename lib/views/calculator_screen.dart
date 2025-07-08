@@ -2,13 +2,6 @@ import 'package:calculadora_fea_a_5_pesos/widgets/animated_background.dart';
 import 'package:flutter/material.dart';
 import 'package:calculadora_fea_a_5_pesos/widgets/calc_button.dart';
 
-/*
-  PENDIENTES:
-  1- Manejar bien los numeros para que no se llene la pantalla o bien que funcionen como la calculadora de windows
-*/
-
-// enum AppState { start, calculated, error, value }
-
 class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({super.key});
 
@@ -18,28 +11,22 @@ class CalculatorScreen extends StatefulWidget {
 
 class _CalculatorScreenState extends State<CalculatorScreen> {
   String _displayText = "";
-  // AppState state = AppState.start;
   String state = "assets/images/start";
   int frameCount = 1;
   // metodo para cambiar el state del texto desde los botones en calc_button.dart
   void _onButtonPressed(String value, String input) {
     setState(() {
-      // falta manejar cuando haya error
       _displayText = value;
       if (input == "=" || input == "%") {
-        // state = AppState.value;
         state = "assets/images/value";
         frameCount = 1;
       } else if (input == "C") {
-        // state = AppState.start;
         state = "assets/images/start";
         frameCount = 1;
       } else if (input == "error") {
-        // state = AppState.error;
         state = "assets/images/error";
         frameCount = 4;
       } else {
-        // state = AppState.calculated;
         state = "assets/images/calculated";
         frameCount = 4;
       }
