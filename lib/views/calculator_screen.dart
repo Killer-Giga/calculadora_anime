@@ -14,23 +14,38 @@ class CalculatorScreen extends StatefulWidget {
 }
 
 class _CalculatorScreenState extends State<CalculatorScreen> {
-
   String _displayText = "";
   String _image = "assets/images/mona_china.jpg";
 
-// metodo para cambiar el estado del texto desde los botones en calc_button.dart
-  void _onButtonPressed(String value, String input){
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _precacheImages();
+  }
+
+  void _precacheImages() {
+    precacheImage(const AssetImage("assets/images/mona_china.jpg"), context);
+    precacheImage(
+      const AssetImage("assets/images/mona_china_respuesta.jpg"),
+      context,
+    );
+    precacheImage(
+      const AssetImage("assets/images/mona_china_escribiendo.jpg"),
+      context,
+    );
+  }
+
+  // metodo para cambiar el estado del texto desde los botones en calc_button.dart
+  void _onButtonPressed(String value, String input) {
     setState(() {
       _displayText = value;
-      if (input == "=" || input == "%"){
+      if (input == "=" || input == "%") {
         _image = "assets/images/mona_china_respuesta.jpg";
-      }
-      else if (input == "C"){
+      } else if (input == "C") {
         _image = "assets/images/mona_china.jpg";
       } else {
         _image = "assets/images/mona_china_escribiendo.jpg";
       }
-      
     });
   }
 
@@ -38,16 +53,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       //appBar: AppBar(title: const Text("Calculadora")),
-
       body: Stack(
         children: [
           // Imagen de fondo
-          Positioned.fill(
-            child: Image.asset(
-              _image,
-              fit: BoxFit.cover,
-            ),
-          ),
+          Positioned.fill(child: Image.asset(_image, fit: BoxFit.cover)),
 
           // Contenido principal (encima del fondo)
           SafeArea(
@@ -60,7 +69,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   child: Container(
                     alignment: Alignment.bottomRight,
                     padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: .5),
                       borderRadius: BorderRadius.circular(8),
@@ -69,10 +81,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                       // Aqui esta la expresion y resultado. Deberian ser 2 expresion arriba y resultado abajo
                       // PENDIENTE!!!
                       _displayText,
-                      style: TextStyle(
-                        fontSize: 32,
-                        color: Colors.white,
-                      ),
+                      style: TextStyle(fontSize: 32, color: Colors.white),
                     ),
                   ),
                 ),
