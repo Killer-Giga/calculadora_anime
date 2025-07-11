@@ -203,7 +203,8 @@ class CalculatorLogic {
     final expr = parser.parse(
       leftExpr.replaceAll('x', '*').replaceAll('÷', '/'),
     );
-    final a = expr.evaluate(EvaluationType.REAL, ContextModel());
+    final evaluator = RealEvaluator(ContextModel());
+    final double a = evaluator.evaluate(expr).toDouble();
 
     // Aplico la regla de porcentaje según el operador
     double rawResult;
@@ -234,23 +235,20 @@ class CalculatorLogic {
 
  void evaluateExpression() {
   try {
-    final String normalizedExpr = normalizedExpression();
-    final parser = GrammarParser();
-    Expression expression = parser.parse(normalizedExpr);
-    ContextModel contextModel = ContextModel();
-    double evalResult = expression.evaluate(
-      EvaluationType.REAL,
-      contextModel,
-    );
+    final parsed = normalizedExpression();
+      final expr = GrammarParser().parse(parsed);
+      final context = ContextModel();
+      final evaluator = RealEvaluator(context);
+      final value = evaluator.evaluate(expr);
 
     // Verifica si es infinito o NaN
-    if (evalResult.isInfinite || evalResult.isNaN) {
+    if (value.isInfinite || value.isNaN) {
       _result = "No se puede dividir entre cero";
       afterResult = true;
       throw Exception("División por cero"); // Lanza para que llegue al catch en UI
     }
 
-    formattedExpression(evalResult);
+    formattedExpression(value.toDouble());
   } catch (e) {
     // Ya seteamos _result arriba si fue división por cero
     if (_result != "No se puede dividir entre cero") {
