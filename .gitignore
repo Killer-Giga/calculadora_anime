@@ -43,3 +43,20 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Claves de firma
+*.jks
+*.keystore
+key.properties
+/.keys/
+
+
+# Configuraciones locales de Android Studio/VSCode
+local.properties
+android/local.properties
+.vscode/
+.idea/
+
+# Archivos de log y temporales
+*.log
+*.tmp
