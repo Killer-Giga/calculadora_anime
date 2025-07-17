@@ -1,0 +1,26 @@
+flutter_launcher_icons:
+  image_path: "assets/images/start/mono_001.png"
+
+  android: true
+  adaptive_icon_background: "#ffffff" # o un color personalizado
+  adaptive_icon_foreground: "assets/images/start/mono_001.png" # la imagen sin fondo
+  remove_alpha_android: true
+  min_sdk_android: 21
+
+  ios: true
+  remove_alpha_ios: true
+
+  web:
+    generate: true
+    image_path: "assets/images/start/mono_001.png"
+    background_color: "#ffffff"
+    theme_color: "#ffffff"
+
+  windows:
+    generate: true
+    image_path: "assets/images/start/mono_001.png"
+    icon_size: 128
+
+  macos:
+    generate: true
+    image_path: "assets/images/start/mono_001.png"
