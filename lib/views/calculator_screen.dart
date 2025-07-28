@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:calculadora_anime/widgets/calc_button.dart';
 
-/*
-  PENDIENTES:
-  1- Manejar bien los numeros para que no se llene la pantalla o bien que funcionen como la calculadora de windows
-*/
-
 class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({super.key});
 
@@ -14,23 +9,31 @@ class CalculatorScreen extends StatefulWidget {
 }
 
 class _CalculatorScreenState extends State<CalculatorScreen> {
+  bool _imagesPrecached = false;
   String _displayText = "";
-  String _image = "assets/images/mona_china.jpg";
+  String _image = "assets/images/mona_china_mejorada.png";
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _precacheImages();
+    if (!_imagesPrecached) {
+      _precacheImages();
+      _imagesPrecached = true;
+    }
   }
 
-  void _precacheImages() {
-    precacheImage(const AssetImage("assets/images/mona_china.jpg"), context);
-    precacheImage(
-      const AssetImage("assets/images/mona_china_respuesta.jpg"),
+  void _precacheImages() async {
+    await precacheImage(const AssetImage("assets/images/mona_china_mejorada.png"), context);
+    await precacheImage(
+      const AssetImage("assets/images/mona_china_respuesta_hd.png"),
       context,
     );
-    precacheImage(
-      const AssetImage("assets/images/mona_china_escribiendo.jpg"),
+    await precacheImage(
+      const AssetImage("assets/images/mona_china_escribiendo_hd.png"),
+      context,
+    );
+    await precacheImage(
+      const AssetImage("assets/images/mona_china_error_hd.png"),
       context,
     );
   }
@@ -40,11 +43,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     setState(() {
       _displayText = value;
       if (input == "=" || input == "%") {
-        _image = "assets/images/mona_china_respuesta.jpg";
+        _image = "assets/images/mona_china_respuesta_hd.png";
       } else if (input == "C") {
-        _image = "assets/images/mona_china.jpg";
-      } else {
-        _image = "assets/images/mona_china_escribiendo.jpg";
+        _image = "assets/images/mona_china_mejorada.png";
+      } else if (input == "error") {
+        _image = "assets/images/mona_china_error_hd.png";
+        } else {
+        _image = "assets/images/mona_china_escribiendo_hd.png";
       }
     });
   }
@@ -78,8 +83,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      // Aqui esta la expresion y resultado. Deberian ser 2 expresion arriba y resultado abajo
-                      // PENDIENTE!!!
+                      // Aqui esta la expresion y resultado.
                       _displayText,
                       style: TextStyle(fontSize: 32, color: Colors.white),
                     ),

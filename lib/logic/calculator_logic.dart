@@ -233,19 +233,31 @@ class CalculatorLogic {
     formattedExpression(rawResult);
   }
 
-  void evaluateExpression() {
-    try {
-      final parsed = normalizedExpression();
+ void evaluateExpression() {
+  try {
+    final parsed = normalizedExpression();
       final expr = GrammarParser().parse(parsed);
       final context = ContextModel();
       final evaluator = RealEvaluator(context);
       final value = evaluator.evaluate(expr);
 
-      formattedExpression(value.toDouble());
-    } catch (e) {
+    // Verifica si es infinito o NaN
+    if (value.isInfinite || value.isNaN) {
+      _result = "No se puede dividir entre cero";
+      afterResult = true;
+      throw Exception("División por cero"); // Lanza para que llegue al catch en UI
+    }
+
+    formattedExpression(value.toDouble());
+  } catch (e) {
+    // Ya seteamos _result arriba si fue división por cero
+    if (_result != "No se puede dividir entre cero") {
       _result = "Error";
     }
+    afterResult = true;
+    rethrow;
   }
+}
 
   void formattedExpression(double rawResult) {
     String formatted;
