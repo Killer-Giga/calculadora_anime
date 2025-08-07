@@ -2,11 +2,14 @@ import 'package:math_expressions/math_expressions.dart';
 
 class CalculatorLogic {
   String _expression = "";
+  String _partialResult = "";
   String _result = "0";
   List<String> history = [];
 
   // Estado interno
+  bool isPartialResult = false;
   bool afterResult = false;
+  bool isError = false;
 
   final operators = ["+", "-", "x", "÷"];
   final advancedOperators = ["+", "-", "x", "÷", "%"];
@@ -14,9 +17,16 @@ class CalculatorLogic {
 
   String get expression => _expression;
   String get result => _result;
+  String get partialResult => _partialResult;
 
   void addCharacter(String char) {
     // Manejo especial después de un resultado
+    if (isError) {
+      isError = false;
+      _expression = "";
+      _result = "";
+    }
+
     if (_result.isNotEmpty &&
         _result != "0" &&
         _result != "Error" &&
@@ -76,6 +86,7 @@ class CalculatorLogic {
     }
     // Manejo de números
     _expression += char;
+    evaluatePartial();
   }
 
   bool hasDecimalPointInCurrentNumber() {
@@ -110,21 +121,26 @@ class CalculatorLogic {
   void clear() {
     _expression = "";
     _result = "0";
+    _partialResult = "";
     afterResult = false;
+    isPartialResult = false;
+    isError = false;
   }
 
   void deleteLast() {
     if (_expression.isNotEmpty && !afterResult) {
       _expression = _expression.substring(0, _expression.length - 1);
-
       // Si la expresión queda vacía, restaurar valores
       if (_expression.isEmpty) {
         _result = "0";
+        isPartialResult = false;
       }
+      evaluatePartial();
     }
   }
 
   void toggleSign() {
+    if (_expression.isEmpty) return;
     if (afterResult) {
       afterResult = false;
     }
@@ -160,30 +176,15 @@ class CalculatorLogic {
     }
   }
 
-  String normalizedExpression() {
-    if (_expression.isEmpty) return "0";
-    // Eliminar operadores solitarios al final
-    if (operators.any((op) => _expression.endsWith(op))) {
-      _expression = _expression.substring(0, _expression.length - 1);
-    }
-
-    // Normalizar la expresión
-    String normalizedExpr = _expression
-        .replaceAll('x', '*')
-        .replaceAll('÷', '/');
-
-    // Eliminar puntos decimales solitarios al final
-    if (normalizedExpr.endsWith(".")) {
-      normalizedExpr = normalizedExpr.substring(0, normalizedExpr.length - 1);
-    }
-    return normalizedExpr;
-  }
-
   void percentage() {
+    isPartialResult = false;
+
     if (afterResult) {
-        double number = double.tryParse(_expression) ?? 0;
-        double percentage = number / 100;
-        formattedExpression(percentage);
+      double number = double.tryParse(_expression) ?? 0;
+      double percentage = number / 100;
+      _result = formatDouble(percentage);
+      _expression = _result;
+      _partialResult = _expression;
     }
 
     String normalizedExpr = normalizedExpression();
@@ -230,55 +231,96 @@ class CalculatorLogic {
         return;
     }
 
-    formattedExpression(rawResult);
+    //formattedExpression(rawResult);
+    _result = formatDouble(rawResult);
+    _expression = _result;
+    _partialResult = _expression;
   }
 
- void evaluateExpression() {
-  try {
+  void evaluateExpression() {
+    try {
+      isPartialResult = false;
+      final parsed = normalizedExpression();
+      final value = evaluate(parsed);
+
+      if (value == null) {
+        _result = "No se puede dividir entre cero";
+        afterResult = true;
+        throw Exception("División por cero");
+      }
+
+      final formatted = formatDouble(value);
+      history.add('$_expression = $formatted');
+      _expression = formatted;
+      _result = formatted;
+      afterResult = true;
+    } catch (e) {
+      isError = true;
+      if (_result != "No se puede dividir entre cero") {
+        _result = "Error";
+      }
+      afterResult = true;
+      rethrow;
+    }
+  }
+
+  void evaluatePartial() {
     final parsed = normalizedExpression();
-      final expr = GrammarParser().parse(parsed);
+    final value = evaluate(parsed);
+
+    if (value != null) {
+      _partialResult = formatDouble(value);
+      isPartialResult = true;
+    } else {
+      _partialResult = "";
+      isPartialResult = false;
+    }
+  }
+
+  double? evaluate(String expression) {
+    try {
+      final parser = GrammarParser().parse(expression);
       final context = ContextModel();
       final evaluator = RealEvaluator(context);
-      final value = evaluator.evaluate(expr);
+      final result = evaluator.evaluate(parser);
 
-    // Verifica si es infinito o NaN
-    if (value.isInfinite || value.isNaN) {
-      _result = "No se puede dividir entre cero";
-      afterResult = true;
-      throw Exception("División por cero"); // Lanza para que llegue al catch en UI
-    }
+      if (result.isInfinite || result.isNaN) return null;
 
-    formattedExpression(value.toDouble());
-  } catch (e) {
-    // Ya seteamos _result arriba si fue división por cero
-    if (_result != "No se puede dividir entre cero") {
-      _result = "Error";
+      return result.toDouble();
+    } catch (e) {
+      return null;
     }
-    afterResult = true;
-    rethrow;
   }
-}
 
-  void formattedExpression(double rawResult) {
-    String formatted;
-
-    // 1) Si es infinito o demasiado grande, usamos exponencial
-    if (rawResult.isInfinite || rawResult.abs() > 1e12) {
-      formatted = rawResult.toStringAsExponential(6);
+  String normalizedExpression() {
+    if (_expression.isEmpty) return "0";
+    // Eliminar operadores solitarios al final
+    if (operators.any((op) => _expression.endsWith(op))) {
+      _expression = _expression.substring(0, _expression.length - 1);
     }
-    // 2) Si cabe en entero o decimal normal, seguimos igual
-    else if (rawResult == rawResult.roundToDouble()) {
-      formatted = rawResult.toInt().toString();
+
+    // Normalizar la expresión
+    String normalizedExpr = _expression
+        .replaceAll('x', '*')
+        .replaceAll('÷', '/');
+
+    // Eliminar puntos decimales solitarios al final
+    if (normalizedExpr.endsWith(".")) {
+      normalizedExpr = normalizedExpr.substring(0, normalizedExpr.length - 1);
+    }
+    return normalizedExpr;
+  }
+
+  String formatDouble(double rawResult) {
+    if (rawResult.isInfinite || rawResult.abs() > 1e12) {
+      return rawResult.toStringAsExponential(6);
+    } else if (rawResult == rawResult.roundToDouble()) {
+      return rawResult.toInt().toString();
     } else {
-      formatted = rawResult
+      return rawResult
           .toStringAsFixed(10)
           .replaceAll(RegExp(r'0*$'), '')
           .replaceAll(RegExp(r'\.$'), '');
     }
-
-    history.add('$_expression = $formatted');
-    _expression = formatted;
-    _result = formatted;
-    afterResult = true;
   }
 }
