@@ -2,7 +2,7 @@ import 'package:calculadora_anime/logic/calculator_logic.dart';
 import 'package:flutter/material.dart';
 
 class CalcButton extends StatefulWidget {
-  final void Function(String, String) onPressed;
+  final void Function(String, String, bool, String) onPressed;
 
   const CalcButton({super.key, required this.onPressed});
 
@@ -49,31 +49,31 @@ class _CalcButtonState extends State<CalcButton> {
                   switch (label) {
                     case "DEL":
                       calculator.deleteLast();
-                      widget.onPressed(calculator.expression, label);
+                      widget.onPressed(calculator.expression, label, calculator.isPartialResult, calculator.partialResult);
                       break;
                     case "C":
                       calculator.clear();
-                      widget.onPressed(calculator.result, label);
+                      widget.onPressed(calculator.result, label, calculator.isPartialResult, calculator.partialResult);
                       break;
                     case "=":
                       calculator.evaluateExpression();
-                      widget.onPressed(calculator.result, label);
+                      widget.onPressed(calculator.result, label, calculator.isPartialResult, calculator.partialResult);
                       break;
                     case "+-":
                       calculator.toggleSign();
-                      widget.onPressed(calculator.expression, label);
+                      widget.onPressed(calculator.expression, label, calculator.isPartialResult, calculator.partialResult);
                       break;
                     case "%":
                       calculator.percentage();
-                      widget.onPressed(calculator.result, label);
+                      widget.onPressed(calculator.result, label, calculator.isPartialResult, calculator.partialResult);
                       break;
                     default:
                       calculator.addCharacter(label);
-                      widget.onPressed(calculator.expression, label);
+                      widget.onPressed(calculator.expression, label, calculator.isPartialResult, calculator.partialResult);
                       break;
                   }
                 } catch (e) {
-                  widget.onPressed(calculator.result, "error");
+                  widget.onPressed(calculator.result, "error", false, calculator.partialResult);
                 }
               },
               child: label == "DEL"
