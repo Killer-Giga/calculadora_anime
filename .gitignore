@@ -60,3 +60,5 @@ android/local.properties
 # Archivos de log y temporales
 *.log
 *.tmp
+# Widget Preview related
+.widget_preview/
